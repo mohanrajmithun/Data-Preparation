@@ -1,0 +1,125 @@
+```{r}
+rain=read.csv("weatherAus.csv")
+```
+
+```{r}
+new.data <- na.omit(rain)
+```
+
+```{r}
+new.data$Location=as.numeric(factor(new.data$Location))
+new.data$WindGustDir=as.numeric(factor(new.data$WindGustDir))
+new.data$WindDir9am=as.numeric(factor(new.data$WindDir9am))
+new.data$WindDir3pm=as.numeric(factor(new.data$WindDir3pm))
+new.data$RainToday=as.numeric(factor(new.data$RainToday))
+new.data$RainTomorrow=(factor(new.data$RainTomorrow))
+```
+
+```{r}
+new.data$Date=as.Date(new.data$Date)
+ydate = factor(format(new.data$Date,'%m'))
+new.data$Date=ydate
+table(new.data$Date)
+```
+
+```{r}
+
+
+
+```
+
+```{r}
+
+library(ggplot2)
+ggplot(new.data[,],aes(x=Date,y=Location,color=RainTomorrow)) + geom_point(shape=1) + ggtitle("Importance of Date variable is observed when plotted against location")
+
+```
+
+```{r}
+set.seed(2)
+train.index <- sample(c(1:dim(new.data)[1]), dim(new.data)[1]*0.6)
+train.df <- new.data[train.index,]
+valid.df <- new.data[-train.index,]
+```
+
+```{r}
+
+
+
+```
+
+```{r}
+library(caret)
+confusionMatrix(conf)
+
+```
+
+
+```{r}
+library(randomForest)
+library(caret)
+model <- randomForest(RainTomorrow~MinTemp + MaxTemp + Rainfall + Sunshine + WindGustDir + WindGustSpeed + WindDir9am + WindDir3pm + WindSpeed9am + WindSpeed3pm + Humidity9am + Humidity3pm + Pressure9am + Pressure3pm + Cloud9am + Cloud3pm + RainToday+Date,train.df,mtry=6,ntree=600)
+mod=randomForest(RainTomorrow~.,train.df)
+
+y=valid.df$RainTomorrow
+rf.pred = predict(model,valid.df[-24])
+conf=table(rf.pred,y)
+confusionMatrix(conf)
+
+```
+
+```{r}
+model
+importance(model,type=2)
+plot(model)
+ggplot(train.df,aes(x=log(Sunshine),y=log(RISK_MM),color=RainTomorrow)) + geom_point(shape=1)
+```
+
+```{r}
+logit.reg <- glm(RainTomorrow~MinTemp + MaxTemp + Rainfall + Sunshine + WindGustDir + WindGustSpeed + WindDir9am + WindDir3pm + WindSpeed9am + WindSpeed3pm + Humidity9am + Humidity3pm + Pressure9am + Pressure3pm + Cloud9am + Cloud3pm + RainToday+Date, data = train.df, family = "binomial",control = list(maxit = 50, epsilon=1))
+logit.reg.pred <- predict(logit.reg,valid.df, type = "response")
+pred=ifelse(logit.reg.pred>0.5,"Yes","No")
+conf=table(pred,valid.df$RainTomorrow)
+confusionMatrix(conf)
+```
+
+```{r}
+bestframe=subset(new.data[1:100,], select=c(RainTomorrow,MinTemp ,MaxTemp , Rainfall ,Sunshine , WindGustSpeed, WindSpeed9am ,WindSpeed3pm , Humidity9am , Humidity3pm , Pressure9am , Pressure3pm , Cloud9am , Cloud3pm ,RainToday,Date,WindGustDir,WindDir9am , WindDir3pm))
+
+```
+
+```{r}
+library(DiscriMiner)
+da.reg <- linDA(bestframe[,c(2,3,4,5,6,9,10,11,12,13,14,15,16)],bestframe[,1]) 
+da.reg$functions 
+confusionMatrix(da.reg$classification, bestframe$RainTomorrow) 
+da.reg$specs
+```
+
+```{r}
+selected.var <- c(1, 7, 18,19)
+train.index <- sample(c(1:dim(bestframe)[1]), dim(bestframe)[1]*0.6)
+train.df <- bestframe[train.index, selected.var]
+valid.df <- bestframe[-train.index, selected.var]
+
+```
+
+```{r}
+delays.nb <- naiveBayes(RainTomorrow ~ ., data = train.df)
+pred.prob <- predict(delays.nb, newdata = valid.df, type = "raw")
+pred.class <- predict(delays.nb, newdata = valid.df)
+conf=table(valid.df$RainTomorrow,pred.class)
+confusionMatrix(conf)
+```
+
+```{r}
+
+
+
+```
+
+```{r}
+
+
+```
+
