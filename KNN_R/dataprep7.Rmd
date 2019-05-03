@@ -1,0 +1,59 @@
+```{r}
+Boston=read.csv("BostonHousing.csv")
+ndata <- Boston[c(1:13)]
+
+
+
+
+
+```
+
+```{r}
+set.seed(450)
+smp_size <- floor(0.6* nrow(ndata))
+train_idx <- sample(seq_len(nrow(ndata)), size = smp_size)
+treX_boston = ndata[train_idx, c(1:12)]
+teX_boston = ndata[-train_idx,c(1:12) ]
+trY_boston = ndata[train_idx, "MEDV"]
+teY_boston = ndata[-train_idx,"MEDV" ]
+trX_boston=as.data.frame(apply(treX_boston[,], 2, function(x) (x - min(x))/(max(x)-min(x))))
+teX_boston=as.data.frame(apply(teX_boston[,], 2, function(x) (x - min(x))/(max(x)-min(x))))
+
+```
+
+```{r}
+library(FNN)
+pred <- knn.reg(trX_boston, teX_boston, trY_boston, k = )$pred
+actual = teY_boston
+predicted = pred
+rmse = function(actual, predicted) {
+sqrt(mean((actual - predicted) ^ 2))
+}
+rmsvalues=rmse(actual = actual,predicted = pred)
+rmsvalues
+
+```
+
+```{r}
+library(caret)
+
+norm.values <- preProcess(treX_boston[,], method=c("center", "scale"))
+newdf <- data.frame(
+CRIM=0.2, ZN=0,INDUS=7,CHAS=0,NOX=0.538,RM=6,AGE=62,DIS=4.7,RAD=4,TAX=307,PTRATIO=21,LSTAT=10)
+newdf<- predict(norm.values, newdf)
+predicted<- FNN::knn.reg(trX_boston, newdf, trY_boston, k = 3)$pred
+predicted
+
+```
+
+```{r}
+pred <- knn.reg(trX_boston, trX_boston, trY_boston, k = 3)$pred
+actual = trY_boston
+predicted = pred
+rmse = function(actual, predicted) {
+sqrt(mean((actual - predicted) ^ 2))
+}
+rmsvalues=rmse(actual = actual,predicted = pred)
+rmsvalues
+```
+
