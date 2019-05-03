@@ -1,0 +1,28 @@
+dat=read.csv("Universities.csv")
+```{r}
+dat=read.csv("Universities.csv")
+head(dat)
+```
+```{r}
+
+```
+
+```{r}
+ dat_clean<-na.omit(within(dat, rm(College.Name, State, Public..1...Private..2.))) 
+str(dat_clean)
+```
+```{r}
+pca_results<- prcomp(dat_clean)
+summary(pca_results) 
+```
+
+```{r}
+pca_results<- prcomp(dat_clean,scale. = T) 
+summary(pca_results)
+```
+
+```{r}
+head(pca_results$rotation)
+head(pca_results$x)
+```
+

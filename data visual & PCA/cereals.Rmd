@@ -1,0 +1,76 @@
+```{r}
+train=read.csv("Cereals.csv")
+datanum<- train[,-(1:3),drop=FALSE] 
+
+datanum
+
+
+
+```
+
+
+
+```{r}
+print("the following is the mean values of corresponding numeric variables")
+sapply(datanum,mean,na.rm=TRUE)
+print("the following is the median values of corresponding numeric variables")
+sapply(datanum,median,na.rm=TRUE)
+
+print("the following is the minimum values of corresponding numeric variables")
+sapply(datanum,min,na.rm=TRUE)
+print("the following is the maximum values of corresponding numeric variables")
+sapply(datanum,max,na.rm=TRUE)
+print("the following is the standard deviation values of corresponding numeric variables")
+sapply(datanum,var,na.rm=TRUE)
+
+
+
+```
+
+
+```{r}
+hist(datanum$calories)
+hist(datanum$protein)
+hist(datanum$fat)
+hist(datanum$sodium)
+hist(datanum$fiber)
+hist(datanum$carbo)
+hist(datanum$sugars)
+hist(datanum$potass)
+hist(datanum$vitamins)
+hist(datanum$shelf)
+hist(datanum$weight)
+hist(datanum$cups)
+hist(datanum$rating)
+
+```
+
+```{r}
+
+boxplot(datanum$calories ~ train$type)
+
+
+```
+
+```{r}
+
+boxplot(datanum$rating ~ datanum$shelf)
+
+```
+
+```{r}
+print("before normalizing")
+cor(datanum,use="complete.obs")
+dat=apply(datanum,2, scale)
+datan=as.data.frame(dat)
+print("after normalizing")
+cor(datan,use="complete.obs")
+
+```
+
+```{r}
+plot(datanum)
+
+```
+
+
