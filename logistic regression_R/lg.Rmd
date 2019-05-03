@@ -1,0 +1,121 @@
+```{r}
+dat=read.csv("eBayAuctions.csv")
+install.packages("dummies")
+dat
+
+
+```
+
+```{r}
+
+
+ebay <- dummy.data.frame(dat, sep = ".")
+ebay
+```
+
+```{r}
+install.packages("reshape")
+library(reshape)
+```
+
+```{r}
+data.m <- melt(dat, id=c(1:7), measure=c(8))
+pivot<- cast(data.m,openingprice~variable , mean,margins = TRUE)
+pivot
+```
+
+```{r}
+
+```
+
+```{r}
+set.seed(2)
+train.index <- sample(c(1:dim(ebay)[1]), dim(ebay)[1]*0.6)
+train.df <- ebay[train.index,-31]
+valid.df <- ebay[-train.index, -31]
+dim(valid.df)
+
+```
+
+```{r}
+logit.reg <- glm(train.df$Competitive ~ ., data = train.df[,-32], family = "binomial")
+options(scipen=999)
+summary(logit.reg)
+```
+
+```{r}
+logit.reg.pred <- predict(logit.reg, valid.df[,-32], type = "response")
+pred=ifelse(logit.reg.pred>0.54,"1","0")
+conf=table(valid.df$Competitive.,pred)
+confusionMatrix(conf)
+```
+
+```{r}
+
+```
+
+```{r}
+library(caret) 
+confusionMatrix(conf)
+```
+
+```{r}
+res <- glmulti(train.df$Competitive. ~., data=train.df[,-33], crit="aicc") 
+summary(res)
+```
+
+```{r}
+mod1 = glm(train.df$Competitive.~ .,data=train.df[,-33],family=binomial) 
+#stepwise = step(mod1, direction = "both")
+stepw1=step(mod1,trace = 0)
+summary(stepw1)
+```
+
+```{r}
+
+install.packages("glmulti")
+install.packages("rJava")
+library(rJava)
+library(glmulti)
+
+
+```
+
+```{r}
+prednames <- c("a","b","c","d",
+                "e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","aa","bb","cc","dd","ee","ff")
+names(train.df)[1:32] <- prednames
+
+
+res <- glmulti(y="Competitive.",xr=prednames, data=train.df, crit="aicc") 
+summary(res)
+```
+
+```{r}
+train.df <- ebay[train.index,]
+valid.df <- ebay[-train.index, ]
+mod2 = glm(valid.df$Competitive.~ .,data=valid.df[,-33],family=binomial) 
+#stepwise = step(mod1, direction = "both")
+stepw=step(mod2,trace = 0)
+summary(stepw)
+```
+
+```{r}
+logit.reg <- glm(train.df$Competitive ~ Category.Automotive + Category.Books + 
+    `Category.Clothing/Accessories` + `Category.Coins/Stamps` + 
+    Category.EverythingElse + `Category.Health/Beauty` + Category.Jewelry + 
+    currency.EUR + currency.GBP + sellerRating + endDay.Fri + 
+    endDay.Mon + ClosePrice + OpenPrice, data = train.df[,-33], family = "binomial")
+logit.reg.pred <- predict(logit.reg, train.df[,-33], type = "response")
+pred=ifelse(logit.reg.pred>0.5,"1","0")
+conf=table(train.df$Competitive.,pred)
+confusionMatrix(conf)
+```
+
+```{r}
+
+
+```
+
+```
+

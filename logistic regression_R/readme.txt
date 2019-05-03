@@ -1,0 +1,1 @@
+Objective: to find whether the ebay auctions are competitive or not competitive based on given information about auctions using logistic regression model
