@@ -1,0 +1,46 @@
+```{r}
+dat=read.csv("sysadm.csv")
+
+
+```
+
+```{r}
+library(ggplot2)
+ggplot(dat, aes(x=Experience, y=Training, color=Completed.task)) + geom_point(shape=1)
+p=ggplot(dat, aes(x=Experience, y=Training, color=Completed.task)) + geom_point(shape=1) 
+p + geom_vline(xintercept=9.3) 
+
+
+
+
+
+```
+
+```{r}
+library(DiscriMiner)
+library(caret)
+da.reg <- linDA(dat[,1:2], dat[,3])
+da.reg$functions
+```
+
+```{r}
+
+confusionMatrix(da.reg$classification, dat$Completed.task)
+```
+
+```{r}
+
+propensity<- exp(da.reg$scores[,2])/(exp(da.reg$scores[,1])+exp(da.reg$scores[,2]))
+
+
+```
+
+```{r}
+logit.reg <- glm(dat$Completed.task ~ ., data = dat, family = "binomial")
+logit.reg.pred <- predict(logit.reg,dat, type = "response")
+pred=ifelse(logit.reg.pred>0.5,"Yes","No")
+conf=table(pred,dat$Completed.task)
+conf
+confusionMatrix(conf)
+```
+
